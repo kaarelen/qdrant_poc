@@ -1,3 +1,6 @@
+sudo docker run -p 6333:6333 -v ~/Projects/quadrant_test/quadrant_storage:/qdrant/storage qdrant/qdrant
+python main.py
+
 output example
 - similarity from Word2Vec            |     similarity from qdrant
 - target word: teacups                |     teacups 1.0000001

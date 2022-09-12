@@ -1,21 +1,20 @@
 import re
-import config
 from qdrant_client import QdrantClient
 from qdrant_client.http import models
 from gensim.models import Word2Vec
 
+VECTOR_SIZE = 300
 collection_name = "alice"
 q_client = QdrantClient(host="localhost", port=6333)
 q_client.recreate_collection(
     collection_name=collection_name,
     distance=models.Distance.COSINE,
-    vector_size=config.VECTOR_SIZE,
+    vector_size=VECTOR_SIZE,
 )
 
 
 def get_prepared_text(file_name: str):
-    regex = re.compile("[^a-zA-Z ]")
-
+    regex = re.compile("[^a-zA-Z ]")  # remove all non alphabetic characters, exclude spaces
     with open(file_name, "r") as file:
         text = []
         for i in file.read().split("."):
@@ -26,7 +25,7 @@ def get_prepared_text(file_name: str):
 def get_model():
     return Word2Vec(
         sentences=get_prepared_text("alice.txt"),
-        vector_size=config.VECTOR_SIZE,
+        vector_size=VECTOR_SIZE,
         window=5,
         min_count=2,
         workers=4,
@@ -53,10 +52,9 @@ if __name__ == "__main__":
     print(f"target word {target_word}")
 
     model = get_model()
-    sims = model.wv.most_similar(target_word, topn=30)
 
     print("original (gensim Word2vec):")
-    for similar_word in sims:
+    for similar_word in model.wv.most_similar(target_word, topn=30):
         print(similar_word)
 
     q_client.upsert(
@@ -68,7 +66,5 @@ if __name__ == "__main__":
         collection_name=collection_name,
         query_vector=list(model.wv[target_word]),
         limit=30,
-        # score_threshold=0.7,
-        # search_params=models.Sear-chParams(hnsw_ef=128),
     ):
         print(point.payload["word"], point.score)
