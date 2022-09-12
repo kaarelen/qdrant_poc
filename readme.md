@@ -1,4 +1,4 @@
-sudo docker run -p 6333:6333 -v ~/Projects/quadrant_test/quadrant_storage:/qdrant/storage qdrant/qdrant
+sudo docker run -p 6333:6333 -v ~/path/to/quadrant_storage:/qdrant/storage qdrant/qdrant
 python main.py
 
 output example
